@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Define color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# export APP_NAME=my-new-app
+if [ -z ${APP_NAME+x} ]; then # Fail if APP_NAME is not set
+  printf "${RED}APP_NAME is not set.\nUsage: APP_NAME=my-new-app bin/new-project${NC}\n"
+  exit 1
+fi
+
+# git clone --recursive git@github.com:ylogx/graphql-trial.git ${APP_NAME}
+
+printf "${YELLOW}Renaming graphql-trial to ${APP_NAME}...${NC}\n"
+# Deployment name
+grep -lR --exclude-dir=".git" "graphql-trial" . | xargs sed -i "s/graphql-trial/${APP_NAME}/g"
+# Documentation name
+grep -lR --exclude-dir=".git" "graphql-trial" . | xargs sed -i "s/graphql-trial/${APP_NAME}/g"
+# Package name
+mv graphql_trial ${APP_NAME//[-]/_}
+grep -lR --exclude-dir=".git" "graphql_trial" . | xargs sed -i "s/graphql_trial/${APP_NAME//[-]/_}/g"
+printf "${GREEN}Updated chassis names to ${APP_NAME}.${NC}\n"
+
+# Only do this if the git remote url contains ylogx/graphql-trial
+if git remote -v | grep -q "ylogx/graphql-trial"; then
+  printf "${YELLOW}Initializing new git repository...${NC}\n"
+
+  LATEST_COMMIT=$(git log --pretty=format:'%h' -n 1)
+  rm -rf .git
+  git init
+  git add .
+  git commit -m "Initial commit for ${APP_NAME}
+
+Cloned from graphql-trial: https://github.com/ylogx/graphql-trial on $(date).
+Latest commit: ${LATEST_COMMIT}
+https://github.com/ylogx/graphql-trial/tree/${LATEST_COMMIT}"
+    printf "${GREEN}Initialized new git repository.${NC}\n"
+else
+  printf "${YELLOW}Skipping git initialization!${NC}\n"
+fi
+
+printf "${YELLOW}Setting up dependencies and virtual environment...${NC}\n"
+make init
+printf "${GREEN}Done!${NC}\n"

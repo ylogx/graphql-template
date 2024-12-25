@@ -12,12 +12,31 @@ import strawberry
 from fastapi import FastAPI
 from strawberry.fastapi import GraphQLRouter
 
+# Define custom types for structured responses
+@strawberry.type
+class HelloResponse:
+    message: str
+    status: str
+
+@strawberry.type
+class ItemResponse:
+    name: str
+    description: str
+
 # Define the GraphQL schema using Strawberry
 @strawberry.type
 class Query:
     @strawberry.field
-    def hello(self) -> str:
+    def hello_basic(self) -> str:
         return "Hello, GraphQL!"
+
+    # @strawberry.field
+    # def hello(self) -> dict:
+    #     return {"Hello": "World", "something": performer.perform_something()}
+
+    @strawberry.field
+    def hello(self) -> HelloResponse:
+        return HelloResponse(message="Hello, GraphQL!", status="success")
 
     @strawberry.field
     def ping(self) -> str:
@@ -30,6 +49,11 @@ class Query:
     # @strawberry.field
     # def item(item_id: int, q: Union[str, None] = None):
         # return {"item_id": item_id, "q": q}
+
+    @strawberry.field
+    def item(self, name: str, q: Union[str, None] = None) -> ItemResponse:
+        return ItemResponse(name=name, description=f"This is the item named {name}, {q}")
+
 
 
 schema = strawberry.Schema(Query)

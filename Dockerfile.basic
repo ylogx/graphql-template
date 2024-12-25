@@ -21,4 +21,4 @@ WORKDIR /app
 
 COPY . .
 
-CMD poetry run uvicorn graphql_trial.main:app --reload
+CMD poetry run uvicorn graphql_trial.graph:app --reload

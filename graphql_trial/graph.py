@@ -12,16 +12,20 @@ import strawberry
 from fastapi import FastAPI
 from strawberry.fastapi import GraphQLRouter
 
+
 # Define custom types for structured responses
 @strawberry.type
 class HelloResponse:
     message: str
+    noise: float
     status: str
+
 
 @strawberry.type
 class ItemResponse:
     name: str
     description: str
+
 
 # Define the GraphQL schema using Strawberry
 @strawberry.type
@@ -30,13 +34,11 @@ class Query:
     def hello_basic(self) -> str:
         return "Hello, GraphQL!"
 
-    # @strawberry.field
-    # def hello(self) -> dict:
-    #     return {"Hello": "World", "something": performer.perform_something()}
-
     @strawberry.field
     def hello(self) -> HelloResponse:
-        return HelloResponse(message="Hello, GraphQL!", status="success")
+        # noise = performer.value_generator(add_noise=True)
+        message, noise = performer.perform_something()
+        return HelloResponse(message=message, noise=noise, status="success")
 
     @strawberry.field
     def ping(self) -> str:
@@ -55,7 +57,6 @@ class Query:
         return ItemResponse(name=name, description=f"This is the item named {name}, {q}")
 
 
-
 schema = strawberry.Schema(Query)
 
 # Set up FastAPI with the GraphQL route
@@ -67,6 +68,6 @@ app.include_router(graphql_app, prefix="/graphql")
 # Use `uvicorn graphql_python_server:app --reload` to run this server
 
 
-#@app.put("/items/{item_id}")
-#def update_item(item_id: int, item: Item):
+# @app.put("/items/{item_id}")
+# def update_item(item_id: int, item: Item):
 #    return {"item_name": item.name, "item_id": item_id}

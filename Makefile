@@ -60,8 +60,8 @@ test_ci: check_poetry
 
 run:
 	#poetry run python run.py --help
-	poetry run python run.py perform
-	poetry run uvicorn graphql_trial.main:app --reload
+	# poetry run python run.py perform
+	poetry run uvicorn graphql_trial.graph:app --reload
 
 sh:
 	poetry shell
